@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 // Reference the Unity Analytics namespace
 using UnityEngine.Analytics;
@@ -69,12 +70,20 @@ public class PlayerController : MonoBehaviour {
 
 			SetCountText();
 
-		if (count == 50 && !gameover && !didCustomFire) {
-			Analytics.CustomEvent("fifty_score", new Dictionary<string, object> {
-				{ "score", count }
-			});
-			didCustomFire = true;
-		}			
+			if (count == 50 && !gameover && !didCustomFire) {
+				Analytics.CustomEvent("fifty_score", new Dictionary<string, object> {
+					{ "score", count }
+				});
+				didCustomFire = true;
+			}			
+			
+			WWWForm form = new WWWForm();
+			form.AddField("type", "pickup");
+			form.AddField("context", "toygame");
+			form.AddField("params", "{count: " + count.ToString() + "}" );
+			UnityWebRequest www = UnityWebRequest.Post("http://gbakimchi.herokuapp.com/api/event/", form);
+			www.SendWebRequest();
+			
 
 			
 		}
